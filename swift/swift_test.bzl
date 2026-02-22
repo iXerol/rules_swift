@@ -397,6 +397,11 @@ def _swift_test_impl(ctx):
                 module_name = module_name,
                 output_dir = owner_symbol_graph_dir,
                 swift_infos = swift_infos_including_owner,
+                user_compile_flags = expand_locations(
+                    ctx,
+                    ctx.attr.copts,
+                    ctx.attr.swiftc_inputs,
+                ),
                 toolchains = toolchains,
             )
     else:

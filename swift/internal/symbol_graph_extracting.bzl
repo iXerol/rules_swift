@@ -21,6 +21,47 @@ load(":features.bzl", "gather_toolchains")
 load(":toolchain_utils.bzl", "SWIFT_TOOLCHAIN_TYPE")
 load(":utils.bzl", "merge_compilation_contexts")
 
+def _filter_symbol_graph_user_compile_flags(flags):
+    filtered_flags = []
+    for index in range(len(flags)):
+        flag = flags[index]
+        if flag == "-Xcc":
+            if index + 1 < len(flags):
+                xcc_flag = flags[index + 1]
+                if (
+                    xcc_flag.startswith("-I") or
+                    xcc_flag.startswith("-isystem") or
+                    xcc_flag.startswith("-iquote") or
+                    xcc_flag.startswith("-F") or
+                    xcc_flag.startswith("-ivfsoverlay") or
+                    xcc_flag.startswith("-fmodule-map-file=") or
+                    xcc_flag.startswith("-std=") or
+                    xcc_flag.startswith("-stdlib=") or
+                    xcc_flag == "-nostdinc++"
+                ):
+                    filtered_flags.extend([flag, xcc_flag])
+            continue
+        if index > 0 and flags[index - 1] == "-Xcc":
+            continue
+        if flag.startswith("-cxx-interoperability-mode="):
+            filtered_flags.append(flag)
+            continue
+        if flag.startswith("-Xcc="):
+            xcc_flag = flag[len("-Xcc="):]
+            if (
+                xcc_flag.startswith("-I") or
+                xcc_flag.startswith("-isystem") or
+                xcc_flag.startswith("-iquote") or
+                xcc_flag.startswith("-F") or
+                xcc_flag.startswith("-ivfsoverlay") or
+                xcc_flag.startswith("-fmodule-map-file=") or
+                xcc_flag.startswith("-std=") or
+                xcc_flag.startswith("-stdlib=") or
+                xcc_flag == "-nostdinc++"
+            ):
+                filtered_flags.append(flag)
+    return filtered_flags
+
 def extract_symbol_graph(
         *,
         actions,
@@ -35,7 +76,8 @@ def extract_symbol_graph(
         swift_infos,
         swift_toolchain = None,
         toolchains = None,
-        toolchain_type = SWIFT_TOOLCHAIN_TYPE):
+        toolchain_type = SWIFT_TOOLCHAIN_TYPE,
+        user_compile_flags = None):
     """Extracts the symbol graph from a Swift module.
 
     Args:
@@ -74,6 +116,9 @@ def extract_symbol_graph(
         toolchain_type: The toolchain type of the `swift_toolchain` which is
             used for the proper selection of the execution platform inside
             `run_toolchain_action`.
+        user_compile_flags: Additional per-target Swift compile flags (for
+            example, values from a target's `copts`) that should be applied to
+            symbol graph extraction as well.
     """
     toolchains = gather_toolchains(
         swift_toolchain = swift_toolchain,
@@ -106,6 +151,13 @@ def extract_symbol_graph(
             if module.name == module_name and swift_module.swiftdoc:
                 direct_swiftdocs.append(swift_module.swiftdoc)
 
+    if user_compile_flags == None:
+        user_compile_flags = []
+    else:
+        user_compile_flags = _filter_symbol_graph_user_compile_flags(
+            user_compile_flags,
+        )
+
     prerequisites = struct(
         bin_dir = feature_configuration._bin_dir,
         cc_compilation_context = merged_compilation_context,
@@ -121,6 +173,7 @@ def extract_symbol_graph(
         target_label = feature_configuration._label,
         transitive_modules = transitive_modules,
         transitive_swiftmodules = transitive_swiftmodules,
+        user_compile_flags = user_compile_flags,
     )
 
     run_toolchain_action(

@@ -7,7 +7,7 @@ licenses(["notice"])
 alias(
     name = "swizzle_absolute_xcttestsourcelocation",
     actual = select({
-        "@build_bazel_apple_support//constraints:apple": (
+        "@bazel_tools//src/conditions:darwin": (
             "@build_bazel_apple_support//lib:swizzle_absolute_xcttestsourcelocation"
         ),
         "//conditions:default": ":dummy_swizzle_absolute_xcttestsourcelocation",
