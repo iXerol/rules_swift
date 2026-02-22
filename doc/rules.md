@@ -929,17 +929,22 @@ swift_test(<a href="#swift_test-name">name</a>, <a href="#swift_test-deps">deps<
 
 Compiles and links Swift code into an executable test target.
 
-### XCTest Test Discovery
+### XCTest and Swift Testing
 
-By default, this rule performs _test discovery_ that finds tests written with
-the `XCTest` framework and executes them automatically, without the user
-providing their own `main` entry point.
+This rule supports tests written using `XCTest` and Swift Testing.
+
+By default, this rule performs _test discovery_ that finds `XCTest`-style tests
+and executes them automatically, without the user providing their own `main`
+entry point.
 
 On Apple platforms, `XCTest`-style tests are automatically discovered and
 executed using the Objective-C runtime. To provide the same behavior on Linux,
 the `swift_test` rule performs its own scan for `XCTest`-style tests. In other
 words, you can write a single `swift_test` target that executes the same tests
 on either Linux or Apple platforms.
+
+For Swift Testing, use `swift_test` as the test wrapper and provide an explicit
+entry point by setting `discover_tests = False`.
 
 For non-Apple discovery, symbol graph extraction uses relevant `copts` (such as
 Clang/C++ interop options passed with `-Xcc`) so the discovery inputs match the

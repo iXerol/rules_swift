@@ -71,6 +71,21 @@ def compiler_arguments_test_suite(name, tags = []):
         target_under_test = "//test/fixtures/compiler_arguments:test_package_name",
     )
 
+    action_command_line_test(
+        name = "{}_test_symbol_graph_extract_respects_relevant_copts".format(name),
+        expected_argv = [
+            "-Xcc -nostdinc++",
+            "-Xcc -stdlib=libstdc++",
+        ],
+        mnemonic = "SwiftSymbolGraphExtract",
+        not_expected_argv = [
+            "-D__RULES_SWIFT_SYMBOL_GRAPH_SHOULD_NOT_CONTAIN__",
+        ],
+        tags = all_tags,
+        target_compatible_with = ["@platforms//os:linux"],
+        target_under_test = "//test/fixtures/compiler_arguments:test_symbol_graph_copts",
+    )
+
     split_test(
         name = "{}_split_lib_with_package".format(name),
         expected_argv = ["-package-name lib"],
