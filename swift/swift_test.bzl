@@ -397,6 +397,11 @@ def _swift_test_impl(ctx):
                 module_name = module_name,
                 output_dir = owner_symbol_graph_dir,
                 swift_infos = swift_infos_including_owner,
+                user_compile_flags = expand_locations(
+                    ctx,
+                    ctx.attr.copts,
+                    ctx.attr.swiftc_inputs,
+                ),
                 toolchains = toolchains,
             )
     else:
@@ -563,6 +568,11 @@ the Objective-C runtime to dynamically discover tests. On non-Apple platforms,
 discovery uses symbol graphs generated from dependencies to find classes and
 methods written in XCTest's style.
 
+When test discovery is enabled, relevant user-provided `copts` are also applied
+to symbol graph extraction so discovery sees the same Clang/C++ interop setup as
+normal compilation (for example, include and C++ standard library flags passed
+through `-Xcc`).
+
 If tests are discovered, then you should not provide your own `main` entry point
 in the `swift_test` binary; the test runtime provides the entry point for you.
 If you set this attribute to `False`, then you are responsible for providing
@@ -609,17 +619,26 @@ environment when the test is executed by `bazel test`.
     doc = """\
 Compiles and links Swift code into an executable test target.
 
-### XCTest Test Discovery
+### XCTest and Swift Testing
 
-By default, this rule performs _test discovery_ that finds tests written with
-the `XCTest` framework and executes them automatically, without the user
-providing their own `main` entry point.
+This rule supports tests written using `XCTest` and Swift Testing.
+
+By default, this rule performs _test discovery_ that finds `XCTest`-style tests
+and executes them automatically, without the user providing their own `main`
+entry point.
 
 On Apple platforms, `XCTest`-style tests are automatically discovered and
 executed using the Objective-C runtime. To provide the same behavior on Linux,
 the `swift_test` rule performs its own scan for `XCTest`-style tests. In other
 words, you can write a single `swift_test` target that executes the same tests
 on either Linux or Apple platforms.
+
+For Swift Testing, use `swift_test` as the test wrapper and provide an explicit
+entry point by setting `discover_tests = False`.
+
+For non-Apple discovery, symbol graph extraction uses relevant `copts` (such as
+Clang/C++ interop options passed with `-Xcc`) so the discovery inputs match the
+target's compilation configuration.
 
 There are two approaches that one can take to write a `swift_test` that supports
 test discovery:

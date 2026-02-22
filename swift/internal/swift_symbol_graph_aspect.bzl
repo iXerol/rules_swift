@@ -130,6 +130,7 @@ def _make_swift_symbol_graph_aspect_impl(
                         module_name = module.name,
                         output_dir = output_dir,
                         swift_infos = [swift_info],
+                        user_compile_flags = getattr(aspect_ctx.rule.attr, "copts", []),
                         toolchains = toolchains,
                     )
                     symbol_graphs.append(

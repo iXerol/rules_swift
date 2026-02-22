@@ -418,7 +418,7 @@ A tuple of `(CcLinkingContext, CcLinkingOutputs)` containing the linking
 swift_common.extract_symbol_graph(*, <a href="#swift_common.extract_symbol_graph-actions">actions</a>, <a href="#swift_common.extract_symbol_graph-compilation_contexts">compilation_contexts</a>, <a href="#swift_common.extract_symbol_graph-emit_extension_block_symbols">emit_extension_block_symbols</a>,
                                   <a href="#swift_common.extract_symbol_graph-exec_group">exec_group</a>, <a href="#swift_common.extract_symbol_graph-feature_configuration">feature_configuration</a>, <a href="#swift_common.extract_symbol_graph-include_dev_srch_paths">include_dev_srch_paths</a>,
                                   <a href="#swift_common.extract_symbol_graph-minimum_access_level">minimum_access_level</a>, <a href="#swift_common.extract_symbol_graph-module_name">module_name</a>, <a href="#swift_common.extract_symbol_graph-output_dir">output_dir</a>, <a href="#swift_common.extract_symbol_graph-swift_infos">swift_infos</a>,
-                                  <a href="#swift_common.extract_symbol_graph-swift_toolchain">swift_toolchain</a>, <a href="#swift_common.extract_symbol_graph-toolchains">toolchains</a>, <a href="#swift_common.extract_symbol_graph-toolchain_type">toolchain_type</a>)
+                                  <a href="#swift_common.extract_symbol_graph-swift_toolchain">swift_toolchain</a>, <a href="#swift_common.extract_symbol_graph-toolchains">toolchains</a>, <a href="#swift_common.extract_symbol_graph-toolchain_type">toolchain_type</a>, <a href="#swift_common.extract_symbol_graph-user_compile_flags">user_compile_flags</a>)
 </pre>
 
 Extracts the symbol graph from a Swift module.
@@ -441,6 +441,7 @@ Extracts the symbol graph from a Swift module.
 | <a id="swift_common.extract_symbol_graph-swift_toolchain"></a>swift_toolchain |  The `SwiftToolchainInfo` provider of the toolchain.   |  `None` |
 | <a id="swift_common.extract_symbol_graph-toolchains"></a>toolchains |  The struct containing the Swift and C++ toolchain providers, as returned by `swift_common.find_all_toolchains()`.   |  `None` |
 | <a id="swift_common.extract_symbol_graph-toolchain_type"></a>toolchain_type |  The toolchain type of the `swift_toolchain` which is used for the proper selection of the execution platform inside `run_toolchain_action`.   |  `Label("@rules_swift//toolchains:toolchain_type")` |
+| <a id="swift_common.extract_symbol_graph-user_compile_flags"></a>user_compile_flags |  Additional per-target Swift compile flags (for example, values from a target's `copts`) that should be applied to symbol graph extraction as well.   |  `None` |
 
 
 <a id="swift_common.find_all_toolchains"></a>

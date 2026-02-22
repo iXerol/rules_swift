@@ -38,6 +38,17 @@ swift_test(
     tags = FIXTURE_TAGS,
 )
 
+swift_test(
+    name = "test_symbol_graph_copts",
+    srcs = ["empty.swift"],
+    copts = [
+        "-Xcc -nostdinc++",
+        "-Xcc -stdlib=libstdc++",
+        "-D__RULES_SWIFT_SYMBOL_GRAPH_SHOULD_NOT_CONTAIN__",
+    ],
+    tags = FIXTURE_TAGS,
+)
+
 swift_binary(
     name = "bin",
     srcs = ["empty.swift"],
